@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>ABC Company</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<!-- Common style-->
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+.w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+.fa-anchor,.fa-coffee {font-size:200px}
+</style>
+
+<!-- Alert Style -->
+
+
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+
+table {
+    width: 100%;
+}
+th, td {
+  padding: 15px;
+}
+.alert {
+  padding: 20px;
+  background-color: #A41D00;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.6s;
+  margin-bottom: 15px;
+}
+
+.alert.success {background-color: #04AA6D;}
+
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.closebtn:hover {
+  color: black;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-red w3-card w3-left-align w3-large">
+    <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+    <a href="{{url_for('home')}}" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
+    <a href="{{url_for('add')}}" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Add</a>
+    <a href="{{url_for('approve')}}" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Approve</a>
+    <a href="{{url_for('remove')}}" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Remove</a>
+    <a href="{{url_for('analyse')}}" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Analyse</a>
+  </div>
+
+  <!-- Navbar on small screens -->
+  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+    <a href="{{url_for('add')}}" class="w3-bar-item w3-button w3-padding-large">Add</a>
+    <a href="{{url_for('approve')}}" class="w3-bar-item w3-button w3-padding-large">Approve</a>
+    <a href="{{url_for('remove')}}" class="w3-bar-item w3-button w3-padding-large">Remove</a>
+    <a href="{{url_for('analyse')}}" class="w3-bar-item w3-button w3-padding-large">Analyse</a>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="w3-container w3-red w3-center" style="padding:128px 16px">
+  <h1 class="w3-margin w3-jumbo">ABC Company</h1>
+  <p class="w3-xlarge">Automate DevOps</p>
+</header>
+
+<!-- Flash Message -->
+{% with messages = get_flashed_messages(with_categories=true)%}
+{% if messages %}
+{% for categories, message in messages %}
+<div class="alert {{categories}}">
+<span class="closebtn">&times;</span>
+<strong>{{message}}</strong>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+<div class="w3-row-padding w3-padding-64 w3-container">
+  <div class="w3-content">
+    <div class="w3-twoithird">
+
+      <h1>Approval Requests</h1>
+    <table >
+  <tr>
+    <th>Name</th>
+    <th>Id</th>
+    <th>Instance</th>
+    <th>Size</th>
+      <th>Type</th>
+      <th>UID</th>
+      <th>Approve</th>
+      <th>Deny</th>
+  </tr>
+
+{% for a in allreq %}
+
+      <tr>
+        <td>{{a.name}}</td>
+          <td>{{a.email}}</td>
+          <td>{{a.instance}}</td>
+          <td>{{a.size}}</td>
+          <td>{{a.ec2_type}}</td>
+          <td>{{a.uid}}</td>
+           <td>
+               <!-- Approve Modal  -->
+               <form action="#" method="post">
+                   <input style="display:none" type="text" id="uid" name="uid" value="{{a.uid}}">
+                <button onclick="myFunction(event);" type="button" class="btn btn-primary" data-toggle="modal">Approve</button>
+               <div class="modal fade" id="ModalCenter{{a.uid}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Approve Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        Are you sure you want to approve?<br><br>
+                          Please Enter Admin Credentials<br>
+                          <label for="user_id" style="padding-top:10px">User ID:</label>
+                        <input type="text" id="user_id" name="user_id" required><br><br>
+                        <Label for="pass_wd">Password:</label>
+                        <input type="password" id="pass_wd" name="pass_wd" required><br><br>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name="action" value="approve" class="btn btn-primary">Yes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                   </form>
+            </td>
+           <td>
+               <!-- Deny Modal  -->
+               <form action="#" method="post">
+                   <input style="display:none" type="text"  name="uid" value="{{a.uid}}">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCenterdeny{{a.uid}}">Deny</button>
+               <div class="modal fade" id="ModalCenterdeny{{a.uid}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle1">Deny Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        Are you sure you want to Deny?<br><br>
+                          Please Enter Admin Credentials<br>
+                          <label for="user_id" style="padding-top:10px">User ID:</label>
+                        <input type="text"  name="user_id" required><br><br>
+                        <Label for="pass_wd">Password:</label>
+                        <input type="password"  name="pass_wd" required><br><br>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" name="action" value="deny"  class="btn btn-primary">Yes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                   </form>
+            </td>
+      </tr>
+
+        <!-- Insufficient sizeError Modal script -->
+<script>
+function myFunction(event) {
+  var max_instance = {{avrs.instance}};
+  var max_size = {{avrs.size}};
+  var instance = {{a.instance}};
+  var size = {{a.size}};
+
+
+     if (instance>max_instance && size>max_size) {
+      $("#ModalCenter1").modal();
+      document.getElementById("error_msg").innerHTML = "No of <strong>instance</strong> and <strong>size</strong> cannot be alloted as resources are occupied.";
+     }
+    else if (instance>max_instance) {
+    document.getElementById("error_msg").innerHTML = "No of <strong>instance</strong> cannot be alloted as resources are occupied.";
+     $("#ModalCenter1").modal();
+
+    }
+    else if (size>max_size){
+    document.getElementById("error_msg").innerHTML = "Required <strong>size</strong> cannot be alloted as resources are occupied.";
+     $("#ModalCenter1").modal();
+    }
+    else {
+    $("#ModalCenter{{a.uid}}").modal();
+    }
+
+
+
+}
+
+</script>
+
+{% endfor %}
+
+</table>
+
+
+
+
+
+
+         {% if allreq %}
+          {% else %}
+                <div class="alert success">
+                <span class="closebtn">&times;</span>
+                <strong>YEAH!</strong> No request pending for approval.
+                </div>
+          {% endif %}
+<!--
+      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
+        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+
+    <div class="w3-third w3-center">
+      <i class="fa fa-anchor w3-padding-64 w3-text-red"></i>
+    </div>
+    -->
+        </div>
+  </div>
+</div>
+
+<!-- Max size reached msg modal -->
+<div class="modal fade" id="ModalCenter1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle2">Insufficient Resource</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+
+                        <p id="error_msg"></p>
+                          Please <strong>Remove</strong> the occupied resorce or <strong>Deny</strong> the request.
+
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+<!-- Footer -->
+<footer class="w3-container w3-padding-64 w3-center w3-opacity">
+  <div class="w3-xlarge w3-padding-32">
+    <i class="fa fa-facebook-official w3-hover-opacity"></i>
+    <i class="fa fa-instagram w3-hover-opacity"></i>
+    <i class="fa fa-snapchat w3-hover-opacity"></i>
+    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+    <i class="fa fa-twitter w3-hover-opacity"></i>
+    <i class="fa fa-linkedin w3-hover-opacity"></i>
+ </div>
+ <p>Powered by <a href="#" target="_blank">ABC Company</a></p>
+</footer>
+
+<!-- Alert close script-->
+<script>
+var close = document.getElementsByClassName("closebtn");
+var i;
+
+for (i = 0; i < close.length; i++) {
+  close[i].onclick = function(){
+    var div = this.parentElement;
+    div.style.opacity = "0";
+    setTimeout(function(){ div.style.display = "none"; }, 600);
+  }
+}
+</script>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+<!-- Button trigger modal -->
+
+<!-- Modal
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+  Launch demo modal
+</button>
+
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+-->
